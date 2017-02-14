@@ -19,7 +19,7 @@ public class IndexController {
 
     @RequestMapping("/index")
     String index() throws IOException {
-        indexer.indexXocuments();
+        indexer.indexFiles();
         return "ok";
     }
 }
