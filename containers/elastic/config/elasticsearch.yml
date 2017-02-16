@@ -1,3 +1,5 @@
-network.host: localhost
-path.logs: /usr/share/elasticsearch/logs
-#xpack.security.enabled: false
+http.host: 0.0.0.0
+
+# Uncomment the following lines for a production cluster deployment
+#transport.host: 0.0.0.0
+#discovery.zen.minimum_master_nodes: 1
