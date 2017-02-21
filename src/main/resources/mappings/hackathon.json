@@ -1,0 +1,8 @@
+{
+  "properties": {
+    "body" : {
+      "type" : "text",
+      "analyzer": "standard"
+    }
+  }
+}

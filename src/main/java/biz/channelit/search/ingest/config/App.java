@@ -6,6 +6,7 @@ import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +24,11 @@ import java.net.UnknownHostException;
 @ComponentScan("biz.channelit.search.ingest")
 public class App {
 
+    @Value("${elastic.cluster.name}")
+    String elasticCluster;
 
+    @Value("${elastic.host.name}")
+    String elasticHost;
 
     @RequestMapping("/status")
     @ResponseBody
@@ -38,10 +43,14 @@ public class App {
     @Bean
     public TransportClient esClient() throws UnknownHostException {
         Settings settings = Settings.builder()
-                .put("cluster.name", "elasticsearch").build();
-        TransportClient client = new PreBuiltTransportClient(settings)
-                .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("0.0.0.0"), 9300));
+                .put("cluster.name", elasticCluster).build();
 
-        return client;
+        if (elasticHost.equalsIgnoreCase("localhost")) {
+            return new PreBuiltTransportClient(settings)
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
+        } else {
+            return new PreBuiltTransportClient(settings)
+                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(elasticHost), 9300));
+        }
     };
 }

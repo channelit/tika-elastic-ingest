@@ -31,7 +31,7 @@ public class Indexer {
 
     public void indexXocuments() throws IOException {
 
-        IndexResponse response = client.prepareIndex("twitter", "tweet", "1")
+        IndexResponse response = client.prepareIndex("twitter", "tweet")
                 .setSource(jsonBuilder()
                         .startObject()
                         .field("user", "kimchy")
