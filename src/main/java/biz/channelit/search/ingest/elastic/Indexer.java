@@ -1,6 +1,7 @@
 package biz.channelit.search.ingest.elastic;
 
-import biz.channelit.search.ingest.corenlp.Ner;
+import biz.channelit.search.ingest.corenlp.CoreNlpNer;
+import biz.channelit.search.ingest.opennlp.OpenNlpNer;
 import biz.channelit.search.ingest.tika.Extractor;
 import edu.stanford.nlp.dcoref.CorefChain;
 import org.elasticsearch.action.index.IndexResponse;
@@ -34,7 +35,10 @@ public class Indexer {
     String crawlerpath;
 
     @Autowired
-    Ner ner;
+    CoreNlpNer coreNlpNer;
+
+    @Autowired
+    OpenNlpNer openNlpNer;
 
     public void indexXocuments() throws IOException {
 
@@ -54,8 +58,9 @@ public class Indexer {
         walk(crawlerpath);
         files.forEach(file -> {
             String content = extractFileContet(file);
-            Map<Integer, CorefChain> extractor = ner.extract(content);
-            System.out.println(extractor);
+//            Map<Integer, CorefChain> extractor = coreNlpNer.extract(content);
+            List<String> names = openNlpNer.findNames(content);
+            System.out.println(names);
             try {
                 IndexResponse response = client.prepareIndex("content", "content")
                         .setSource(jsonBuilder()
