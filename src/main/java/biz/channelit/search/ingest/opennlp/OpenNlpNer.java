@@ -31,13 +31,21 @@ public class OpenNlpNer {
     public List<String> findNames(String text) {
         String[] sentences = sdetector.sentDetect(text);
         List<String> names = new ArrayList<>();
-        for (String sentence: sentences) {
-            if (sentence.trim().length() > 40) {
-                String[] tokens = tokenizer.tokenize(sentence);
-                Span nameSpans[] = nameFinder.find(tokens);
-                for(Span s: nameSpans)
-                    names.add(String.join(" ", Arrays.copyOfRange(tokens,s.getStart(), s.getEnd())));
+        try {
+            for (String sentence : sentences) {
+                if (sentence.trim().length() > 40) {
+                    try {
+                        String[] tokens = tokenizer.tokenize(sentence);
+                        Span nameSpans[] = nameFinder.find(tokens);
+                        for (Span s : nameSpans)
+                            names.add(String.join(" ", Arrays.copyOfRange(tokens, s.getStart(), s.getEnd())));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return names;
     }
