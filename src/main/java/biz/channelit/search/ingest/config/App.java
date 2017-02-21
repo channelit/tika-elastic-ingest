@@ -3,6 +3,8 @@ package biz.channelit.search.ingest.config;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.sentdetect.SentenceDetectorME;
+import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
@@ -20,10 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
@@ -94,6 +93,15 @@ public class App {
         is.close();
         NameFinderME nameFinder = new NameFinderME(model);
         return nameFinder;
+    }
+
+    @Bean
+    public SentenceDetectorME sentenceDetectorME() throws IOException {
+        File file = new ClassPathResource("opennlp/en-sent.bin").getFile();
+        InputStream is = new FileInputStream(file);
+        SentenceModel model = new SentenceModel(is);
+        SentenceDetectorME sdetector = new SentenceDetectorME(model);
+        return sdetector;
     }
 
 }

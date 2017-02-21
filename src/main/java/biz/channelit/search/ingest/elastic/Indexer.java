@@ -67,6 +67,7 @@ public class Indexer {
                                 .startObject()
                                 .field("body", content)
                                 .field("insertDate", new Date())
+                                .field("names", names)
                                 .endObject()
                         )
                         .get();

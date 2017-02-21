@@ -13,6 +13,7 @@
         <corenlp.version>3.7.0</corenlp.version>
         <elasticsearch.version>5.2.0</elasticsearch.version>
         <tika.version>1.14</tika.version>
+        <dl4j.version>0.7.2</dl4j.version>
     </properties>
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -69,6 +70,18 @@
             <groupId>org.apache.opennlp</groupId>
             <artifactId>opennlp-tools</artifactId>
             <version>1.7.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>${dl4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-nlp</artifactId>
+            <version>${dl4j.version}</version>
         </dependency>
     </dependencies>
 </project>

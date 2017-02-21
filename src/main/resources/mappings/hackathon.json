@@ -15,6 +15,9 @@
     },
     "author" : {
       "type": "keyword"
+    },
+    "names" : {
+      "type": "keyword"
     }
   }
 }
