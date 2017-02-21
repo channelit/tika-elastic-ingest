@@ -29,9 +29,9 @@ public class IndexController {
         return "ok";
     }
 
-    @RequestMapping(path = "/setup", method = RequestMethod.GET)
-    String setp(@RequestParam("index") String index, @RequestParam("type") String type) throws IOException {
+    @RequestMapping(path = "/setup", method = RequestMethod.GET, produces = "text/json")
+    String setup(@RequestParam("index") String index, @RequestParam("type") String type) throws IOException {
         setup.createMappings(index, type);
-        return "ok";
+        return setup.createMappings(index, type);
     }
 }

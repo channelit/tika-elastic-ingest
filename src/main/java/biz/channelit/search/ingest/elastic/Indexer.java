@@ -1,19 +1,20 @@
 package biz.channelit.search.ingest.elastic;
 
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.AutoDetectParser;
-import org.apache.tika.sax.BodyContentHandler;
+import biz.channelit.search.ingest.corenlp.Ner;
+import biz.channelit.search.ingest.tika.Extractor;
+import edu.stanford.nlp.dcoref.CorefChain;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -28,6 +29,12 @@ public class Indexer {
     TransportClient client;
 
     List<File> files;
+
+    @Value("${crawler.path}")
+    String crawlerpath;
+
+    @Autowired
+    Ner ner;
 
     public void indexXocuments() throws IOException {
 
@@ -44,9 +51,11 @@ public class Indexer {
 
     public void indexFiles() {
         files = new LinkedList<>();
-        walk("/Users/hp/downloads");
+        walk(crawlerpath);
         files.forEach(file -> {
             String content = extractFileContet(file);
+            Map<Integer, CorefChain> extractor = ner.extract(content);
+            System.out.println(extractor);
             try {
                 IndexResponse response = client.prepareIndex("content", "content")
                         .setSource(jsonBuilder()
@@ -64,25 +73,10 @@ public class Indexer {
     }
 
     private String extractFileContet(File file) {
-        AutoDetectParser parser = new AutoDetectParser();
-        BodyContentHandler handler = new BodyContentHandler();
-        Metadata metadata = new Metadata();
-        try (InputStream stream = new FileInputStream(file)) {
-            parser.parse(stream, handler, metadata);
-            return handler.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (TikaException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        }
-        return null;
+        return Extractor.extractFileContet(file);
     }
 
-    public void walk(String path) {
+    private void walk(String path) {
 
         File root = new File(path);
         File[] list = root.listFiles();

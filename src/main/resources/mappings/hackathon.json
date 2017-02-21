@@ -3,6 +3,18 @@
     "body" : {
       "type" : "text",
       "analyzer": "standard"
+    },
+    "url" : {
+      "type": "keyword"
+    },
+    "filename" : {
+      "type": "keyword"
+    },
+    "size" : {
+      "type": "keyword"
+    },
+    "author" : {
+      "type": "keyword"
     }
   }
 }
