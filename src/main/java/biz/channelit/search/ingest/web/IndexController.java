@@ -30,8 +30,15 @@ public class IndexController {
     }
 
     @RequestMapping(path = "/setup", method = RequestMethod.GET, produces = "text/json")
-    String setup(@RequestParam("index") String index, @RequestParam("type") String type) throws IOException {
-        setup.createMappings(index, type);
-        return setup.createMappings(index, type);
+    String setup(@RequestParam("index") String index) throws IOException {
+        return setup.putSettings(index);
     }
+
+
+    @RequestMapping(path = "/ner", method = RequestMethod.GET, produces = "text/json")
+    String ner(@RequestParam("index") String index, @RequestParam("type") String type, @RequestParam("q") String query) throws IOException {
+        indexer.populateNer(index, type, query);
+        return "done";
+    }
+
 }

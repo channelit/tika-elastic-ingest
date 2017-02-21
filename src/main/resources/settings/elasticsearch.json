@@ -1,0 +1,39 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "tika_body": {
+          "tokenizer": "standard",
+          "char_filter": [
+            "html_strip"
+          ]
+        }
+      }
+    }
+  },
+  "mappings": {
+    "hackathon": {
+      "properties": {
+        "body": {
+          "type": "text",
+          "analyzer": "tika_body"
+        },
+        "url": {
+          "type": "keyword"
+        },
+        "filename": {
+          "type": "keyword"
+        },
+        "size": {
+          "type": "keyword"
+        },
+        "author": {
+          "type": "keyword"
+        },
+        "names": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}

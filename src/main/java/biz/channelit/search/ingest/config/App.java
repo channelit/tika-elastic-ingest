@@ -85,16 +85,23 @@ public class App {
         return tokenizer;
     }
 
-    @Bean
-    public NameFinderME tokenNameFinderModel() throws IOException {
-        File file = new ClassPathResource("opennlp/en-ner-person.bin").getFile();
+    @Bean(name = "personNameFinder")
+    public NameFinderME personNameFinder() throws IOException {
+        return getNameFinderME("opennlp/en-ner-person.bin");
+    }
+
+    @Bean(name = "orgNameFinder")
+    public NameFinderME orgNameFinder() throws IOException {
+        return getNameFinderME("opennlp/en-ner-organization.bin");
+    }
+
+    private NameFinderME getNameFinderME(String modelFile) throws IOException {
+        File file = new ClassPathResource(modelFile).getFile();
         InputStream is = new FileInputStream(file);
         TokenNameFinderModel model = new TokenNameFinderModel(is);
         is.close();
-        NameFinderME nameFinder = new NameFinderME(model);
-        return nameFinder;
+        return new NameFinderME(model);
     }
-
     @Bean
     public SentenceDetectorME sentenceDetectorME() throws IOException {
         File file = new ClassPathResource("opennlp/en-sent.bin").getFile();
