@@ -143,7 +143,7 @@ public class Indexer {
         QueryBuilder qb = queryStringQuery(query);
         return client.prepareSearch(index).setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(qb).setFetchSource("body",null).setFrom(from)
-                .setSize(pageSize).execute().actionGet();
+                .setSize(pageSize).get();
     }
 
     public void populateNer(String index, String type, String query) {
