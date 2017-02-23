@@ -162,6 +162,7 @@ public class Indexer {
                     updateRequest.index(index).type(type);
                     updateRequest.id(hit.getId());
                     updateRequest.doc(map);
+                    bulkRequest.add(updateRequest);
                     String[] location = {""};
                     if (map.containsKey("locations")) {
                         List<String> locations = map.get("locations");
@@ -173,9 +174,13 @@ public class Indexer {
                         });
                     }
                     if (!"".equals(location[0])) {
+                        UpdateRequest locationRequest = new UpdateRequest();
+                        locationRequest.index(index).type(type);
+                        locationRequest.id(hit.getId());
+                        locationRequest.doc(map);
+                        bulkRequest.add(locationRequest);
                         updateRequest.doc("location", location[0]);
                     }
-                    bulkRequest.add(updateRequest);
                 }
             });
             from += pageSize;
