@@ -4,6 +4,7 @@ import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,16 +56,21 @@ public class Geo {
         bulkRequest.get();
     }
 
-    public String findLocation(String location) {
+    public GeoPoint findLocation(String location) {
         QueryBuilder qb = queryStringQuery(location);
         SearchResponse response = client.prepareSearch("geo").setTypes("us").setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(qb).setFetchSource("location", null)
                 .setSize(10).get();
-        String geoLocation = "";
         if (response.getHits().hits().length > 0) {
-            geoLocation = response.getHits().getAt(0).getSource().get("location").toString();
+            String out = response.getHits().getAt(0).getSource().get("location").toString();
+            out = out.substring(1, out.length()-1);
+            double lat =  new Double(out.split(",")[0]);
+            double lon =  new Double(out.split(",")[1]);
+            GeoPoint geoLocation =new GeoPoint(lat, lon);
+            System.out.println(geoLocation);
+            return geoLocation;
         }
-        return geoLocation;
+        return null;
     }
 
 }
