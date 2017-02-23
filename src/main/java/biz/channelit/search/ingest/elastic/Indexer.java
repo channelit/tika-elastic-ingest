@@ -1,12 +1,10 @@
 package biz.channelit.search.ingest.elastic;
 
 import biz.channelit.search.ingest.corenlp.CoreNlpNer;
+import biz.channelit.search.ingest.image.Image;
 import biz.channelit.search.ingest.opennlp.OpenNlpNer;
 import biz.channelit.search.ingest.tika.Extractor;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateRequest;
@@ -43,6 +41,8 @@ public class Indexer {
 
     List<String> fileFilter = new LinkedList<>();
 
+    List<String> ocrFilter = new LinkedList<>();
+
     @Value("${crawler.path}")
     String crawlerpath;
 
@@ -58,25 +58,36 @@ public class Indexer {
     @Autowired
     OpenNlpNer openNlpNer;
 
+    @Autowired
+    Image image;
+
     public void indexFiles() {
         //fileFilter.add("pdf");
         //fileFilter.add("doc");
         //fileFilter.add("docx");
-        fileFilter.add("jpg");
+
+        ocrFilter.add("jpg");
+
 
         files = new LinkedList<>();
         int ctr = 0;
         walk(crawlerpath);
-        while (ctr + 20 < files.size()) {
-            subFiles = files.subList(ctr, ctr + 20);
+        while (ctr < files.size()) {
+            subFiles = files.subList(ctr, ((ctr + 20) <= files.size()? ctr + 20 : files.size() ));
             ctr += 20;
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             subFiles.forEach(file -> {
                 String type = file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase();
                 String content = "";
+                System.out.println(file.getName());
                 if (fileFilter.contains(type)) {
-                    content = extractFileContet(file).replaceAll("[^A-Za-z. ]", " ").replaceAll(" +", " ");
+                    content = extractFileContet(file);
                 }
+                if (ocrFilter.contains(type)) {
+                    content = extractImageContent(file);
+                }
+                if (content != null)
+                    content = content.replaceAll("[^A-Za-z. ]", " ").replaceAll(" +", " ");
 //            Map<String, List<String>> map = openNlpNer.getAll(content);
                 try {
                     bulkRequest.add(client.prepareIndex(defaultIndex, defaultType)
@@ -100,6 +111,10 @@ public class Indexer {
 
     private String extractFileContet(File file) {
         return Extractor.extractFileContet(file);
+    }
+
+    private String extractImageContent(File file) {
+        return image.getOcr(file);
     }
 
     private void walk(String path) {

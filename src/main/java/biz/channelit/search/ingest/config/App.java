@@ -1,5 +1,6 @@
 package biz.channelit.search.ingest.config;
 
+import com.asprise.ocr.Ocr;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
@@ -109,6 +110,14 @@ public class App {
         SentenceModel model = new SentenceModel(is);
         SentenceDetectorME sdetector = new SentenceDetectorME(model);
         return sdetector;
+    }
+
+    @Bean
+    public Ocr ocr() {
+        Ocr.setUp(); // one time setup
+        Ocr ocr = new Ocr(); // create a new OCR engine
+        ocr.startEngine("eng", Ocr.SPEED_FASTEST); // English
+        return ocr;
     }
 
 }
