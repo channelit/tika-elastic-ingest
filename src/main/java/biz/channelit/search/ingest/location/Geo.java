@@ -58,7 +58,7 @@ public class Geo {
     public String findLocation(String location) {
         QueryBuilder qb = queryStringQuery(location);
         SearchResponse response = client.prepareSearch("geo").setTypes("us").setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
-                .setQuery(qb).setFetchSource("body", null)
+                .setQuery(qb).setFetchSource("location", null)
                 .setSize(10).execute().actionGet();
         return response.getHits().hits()[0].getFields().get("location").getValues().get(0).toString();
     }
