@@ -60,7 +60,11 @@ public class Geo {
         SearchResponse response = client.prepareSearch("geo").setTypes("us").setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(qb).setFetchSource("location", null)
                 .setSize(10).execute().actionGet();
-        return response.getHits().hits()[0].getFields().get("location").getValues().get(0).toString();
+        String geoLocation = "";
+        if (response.getHits().hits().length > 0) {
+            geoLocation = response.getHits().hits()[0].getFields().get("location").getValues().get(0).toString();
+        }
+        return geoLocation;
     }
 
 }
