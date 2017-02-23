@@ -32,6 +32,15 @@
         },
         "names": {
           "type": "keyword"
+        },
+        "locations": {
+          "type": "text"
+        },
+        "companies": {
+          "type": "text"
+        },
+        "location": {
+          "type": "geo_point"
         }
       }
     }

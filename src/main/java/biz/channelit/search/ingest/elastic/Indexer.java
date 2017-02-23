@@ -2,6 +2,7 @@ package biz.channelit.search.ingest.elastic;
 
 import biz.channelit.search.ingest.corenlp.CoreNlpNer;
 import biz.channelit.search.ingest.image.Image;
+import biz.channelit.search.ingest.location.Geo;
 import biz.channelit.search.ingest.opennlp.OpenNlpNer;
 import biz.channelit.search.ingest.tika.Extractor;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
@@ -16,10 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 import static org.elasticsearch.index.query.QueryBuilders.*;
 
@@ -46,9 +44,6 @@ public class Indexer {
     @Value("${crawler.path}")
     String crawlerpath;
 
-    @Value("${geo.path}")
-    String geoPath;
-
     @Value("${elastic.default.type}")
     String defaultType;
 
@@ -64,8 +59,14 @@ public class Indexer {
     @Autowired
     Image image;
 
+    @Autowired
+    Geo geo;
+
+    private final int pageSize = 10;
+    private final int bulkSize = 20;
+
     public void indexFiles() {
-        //fileFilter.add("pdf");
+        fileFilter.add("pdf");
         //fileFilter.add("doc");
         //fileFilter.add("docx");
 
@@ -76,8 +77,8 @@ public class Indexer {
         int ctr = 0;
         walk(crawlerpath);
         while (ctr < files.size()) {
-            subFiles = files.subList(ctr, ((ctr + 20) <= files.size()? ctr + 20 : files.size() ));
-            ctr += 20;
+            subFiles = files.subList(ctr, ((ctr + bulkSize) <= files.size()? ctr + bulkSize : files.size() ));
+            ctr += bulkSize;
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             subFiles.forEach(file -> {
                 String type = file.getName().substring(file.getName().lastIndexOf(".") + 1).toLowerCase();
@@ -138,24 +139,17 @@ public class Indexer {
         }
     }
 
-    public UpdateResponse update(String index, String type, String id, Map<String, List<String>> map) throws IOException, ExecutionException, InterruptedException {
-        UpdateRequest updateRequest = new UpdateRequest();
-        updateRequest.index(index).type(type);
-        updateRequest.id(id);
-        updateRequest.doc(map);
-        return client.update(updateRequest).get();
-    }
-
     public SearchResponse search(String index, String type, String query,  Integer from) {
         QueryBuilder qb = queryStringQuery(query);
         return client.prepareSearch(index).setTypes(type).setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(qb).setFetchSource("body",null).setFrom(from)
-                .setSize(10).execute().actionGet();
+                .setSize(pageSize).execute().actionGet();
     }
 
     public void populateNer(String index, String type, String query) {
         boolean hasMore = true;
         int from = 0;
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
         while(hasMore) {
             SearchResponse searchResponse = search(index, type, query, from);
             hasMore = (searchResponse.getHits().getHits().length > 0);
@@ -164,40 +158,27 @@ public class Indexer {
                 String content = (String) source.get("body");
                 if (content.trim().length() > 0) {
                     Map<String, List<String>> map = openNlpNer.getAll(content);
-                    try {
-                        update(index, type, hit.getId(), map);
-                    } catch (IOException | ExecutionException | InterruptedException e) {
-                        e.printStackTrace();
+                    UpdateRequest updateRequest = new UpdateRequest();
+                    updateRequest.index(index).type(type);
+                    updateRequest.id(hit.getId());
+                    updateRequest.doc(map);
+                    String[] location = {""};
+                    if (map.containsKey("locations")) {
+                        List<String> locations = map.get("locations");
+                        locations.forEach(loc -> {
+                            String foundloc = geo.findLocation(loc);
+                            if (!foundloc.equals("")) {
+                                location[0] = foundloc;
+                            }
+                        });
                     }
+                    if (!"".equals(location[0])) {
+                        updateRequest.doc("location", location[0]);
+                    }
+                    bulkRequest.add(updateRequest);
                 }
             });
-            from += 10;
-        }
-    }
-
-    public void indexGeoFiles() throws IOException {
-        int ctr = 0;
-
-        BufferedReader br = new BufferedReader(new FileReader(geoPath));
-        String content = null;
-        BulkRequestBuilder bulkRequest = client.prepareBulk();
-        while ((content = br.readLine()) != null) {
-            String[] location = content.split("\t");
-            bulkRequest.add(client.prepareIndex("geo", "us", location[0])
-                    .setSource(jsonBuilder()
-                            .startObject()
-                            .field("searchfield", location[1] + "" + location[2])
-                            .field("location", "[" + location[4] + ", " + location[5] + "]")
-                            .field("state", location[9])
-                            .field("country", location[8])
-                            .endObject()
-                    ));
-            ctr ++;
-            if (ctr > 20) {
-                bulkRequest.get();
-                bulkRequest = client.prepareBulk();
-                ctr = 0;
-            }
+            from += pageSize;
         }
         bulkRequest.get();
     }
