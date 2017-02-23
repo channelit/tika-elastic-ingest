@@ -62,7 +62,7 @@ public class Geo {
                 .setSize(10).execute().actionGet();
         String geoLocation = "";
         if (response.getHits().hits().length > 0) {
-            geoLocation = response.getHits().hits()[0].getFields().get("location").getValues().get(0).toString();
+            geoLocation = response.getHits().getAt(0).getSource().get("location").toString();
         }
         return geoLocation;
     }
