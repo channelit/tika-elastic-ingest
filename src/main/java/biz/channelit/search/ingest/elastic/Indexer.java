@@ -188,6 +188,8 @@ public class Indexer {
                             .startObject()
                             .field("searchfield", location[1] + "" + location[2])
                             .field("location", "[" + location[4] + ", " + location[5] + "]")
+                            .field("state", location[9])
+                            .field("country", location[8])
                             .endObject()
                     ));
             ctr ++;

@@ -23,6 +23,12 @@
         },
         "loc": {
           "type": "geo_point"
+        },
+        "state": {
+          "type": "keyword"
+        },
+        "country": {
+          "type": "keyword"
         }
       }
     }
