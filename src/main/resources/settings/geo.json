@@ -1,0 +1,30 @@
+{
+  "settings": {
+    "analysis": {
+      "analyzer": {
+        "geo_analyzer": {
+          "tokenizer": "geo_tokenizer"
+        }
+      },
+      "tokenizer": {
+        "geo_tokenizer": {
+          "type": "standard",
+          "max_token_length": 9
+        }
+      }
+    }
+  },
+  "mappings": {
+    "geo": {
+      "properties": {
+        "searchfield": {
+          "type": "text",
+          "analyzer": "standard"
+        },
+        "loc": {
+          "type": "geo_point"
+        }
+      }
+    }
+  }
+}

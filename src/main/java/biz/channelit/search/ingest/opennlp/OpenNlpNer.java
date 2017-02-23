@@ -27,6 +27,9 @@ public class OpenNlpNer {
     NameFinderME personNameFinder;
 
     @Autowired
+    NameFinderME locationFinder;
+
+    @Autowired
     SentenceDetectorME sdetector;
 
     public List<String> findNer(NameFinderME nameFinder, String[] tokens) {
@@ -47,10 +50,12 @@ public class OpenNlpNer {
         String[] sentences = sdetector.sentDetect(text);
         try {
             for (String sentence : sentences) {
-                if (sentence.trim().length() > 40) {
+                if (sentence.trim().length() > 30) {
                     String[] tokens = tokenizer.tokenize(sentence);
                     out.put("persons", findNer(personNameFinder, tokens));
                     out.put("companies", findNer(orgNameFinder, tokens));
+                    out.put("locations", findNer(locationFinder, tokens));
+                    out.put("ner", new ArrayList<>());
                 }
             }
         } catch (Exception e) {

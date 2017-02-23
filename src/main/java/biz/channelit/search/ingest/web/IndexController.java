@@ -29,6 +29,12 @@ public class IndexController {
         return "ok";
     }
 
+    @RequestMapping("/geo")
+    String geo() throws IOException {
+        indexer.indexGeoFiles();
+        return "ok";
+    }
+
     @RequestMapping(path = "/setup", method = RequestMethod.GET, produces = "text/json")
     String setup(@RequestParam("index") String index) throws IOException {
         return setup.putSettings(index);

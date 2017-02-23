@@ -96,6 +96,11 @@ public class App {
         return getNameFinderME("opennlp/en-ner-organization.bin");
     }
 
+    @Bean(name = "locationFinder")
+    public NameFinderME locationFinder() throws IOException {
+        return getNameFinderME("opennlp/en-ner-location.bin");
+    }
+
     private NameFinderME getNameFinderME(String modelFile) throws IOException {
         File file = new ClassPathResource(modelFile).getFile();
         InputStream is = new FileInputStream(file);

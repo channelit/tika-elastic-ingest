@@ -15,8 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,15 +35,19 @@ public class Indexer {
     @Autowired
     TransportClient client;
 
-    List<File> files;
-    List<File> subFiles;
+    private List<File> files;
 
-    List<String> fileFilter = new LinkedList<>();
+    private List<File> subFiles;
 
-    List<String> ocrFilter = new LinkedList<>();
+    private List<String> fileFilter = new LinkedList<>();
+
+    private List<String> ocrFilter = new LinkedList<>();
 
     @Value("${crawler.path}")
     String crawlerpath;
+
+    @Value("${geo.path}")
+    String geoPath;
 
     @Value("${elastic.default.type}")
     String defaultType;
@@ -170,5 +173,30 @@ public class Indexer {
             });
             from += 10;
         }
+    }
+
+    public void indexGeoFiles() throws IOException {
+        int ctr = 0;
+
+        BufferedReader br = new BufferedReader(new FileReader(geoPath));
+        String content = null;
+        BulkRequestBuilder bulkRequest = client.prepareBulk();
+        while ((content = br.readLine()) != null) {
+            String[] location = content.split("\t");
+            bulkRequest.add(client.prepareIndex("geo", "us", location[0])
+                    .setSource(jsonBuilder()
+                            .startObject()
+                            .field("searchfield", location[1] + "" + location[2])
+                            .field("location", "[" + location[4] + ", " + location[5] + "]")
+                            .endObject()
+                    ));
+            ctr ++;
+            if (ctr > 20) {
+                bulkRequest.get();
+                bulkRequest = client.prepareBulk();
+                ctr = 0;
+            }
+        }
+        bulkRequest.get();
     }
 }
