@@ -6,11 +6,13 @@ import biz.channelit.search.ingest.location.Geo;
 import biz.channelit.search.ingest.opennlp.OpenNlpNer;
 import biz.channelit.search.ingest.tika.Extractor;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,8 +69,11 @@ public class Indexer {
 
     public void indexFiles() {
         fileFilter.add("pdf");
-        //fileFilter.add("doc");
-        //fileFilter.add("docx");
+        fileFilter.add("doc");
+        fileFilter.add("docx");
+        fileFilter.add("ppt");
+        fileFilter.add("pptx");
+        fileFilter.add("mdb");
 
         ocrFilter.add("jpg");
 
@@ -118,7 +123,12 @@ public class Indexer {
     }
 
     private String extractImageContent(File file) {
-        return image.getOcr(file);
+        try {
+            return image.getOcr(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
     }
 
     private void walk(String path) {
@@ -134,7 +144,7 @@ public class Indexer {
                 System.out.println("Dir:" + f.getAbsoluteFile());
             } else {
                 files.add(f);
-                System.out.println("File:" + f.getAbsoluteFile());
+//                System.out.println("File:" + f.getAbsoluteFile());
             }
         }
     }
@@ -149,10 +159,10 @@ public class Indexer {
     public void populateNer(String index, String type, String query) {
         boolean hasMore = true;
         int from = 0;
-        BulkRequestBuilder bulkRequest = client.prepareBulk();
         while(hasMore) {
             SearchResponse searchResponse = search(index, type, query, from);
             hasMore = (searchResponse.getHits().getHits().length > 0);
+            BulkRequestBuilder bulkRequest = client.prepareBulk();
             searchResponse.getHits().forEach((hit) -> {
                 Map source = hit.getSource();
                 String content = (String) source.get("body");
@@ -163,28 +173,35 @@ public class Indexer {
                     updateRequest.id(hit.getId());
                     updateRequest.doc(map);
                     bulkRequest.add(updateRequest);
-                    String[] location = {""};
+                    List<GeoPoint> geolocations = new ArrayList<>();
                     if (map.containsKey("locations")) {
                         List<String> locations = map.get("locations");
                         locations.forEach(loc -> {
-                            String foundloc = geo.findLocation(loc);
-                            if (!foundloc.equals("")) {
-                                location[0] = foundloc;
+                            GeoPoint foundloc = geo.findLocation(loc);
+                            if (foundloc != null) {
+                                geolocations.add(foundloc);
                             }
                         });
                     }
-                    if (!"".equals(location[0])) {
-                        UpdateRequest locationRequest = new UpdateRequest();
-                        locationRequest.index(index).type(type);
-                        locationRequest.id(hit.getId());
-                        locationRequest.doc(map);
-                        bulkRequest.add(locationRequest);
-                        updateRequest.doc("location", location[0]);
+                    if (geolocations.size()>0) {
+                        UpdateRequest updateLocation = new UpdateRequest();
+                        updateLocation.index(index).type(type);
+                        updateLocation.id(hit.getId());
+                        updateLocation.doc("location", geolocations.get(0));
+                        bulkRequest.add(updateLocation);
+                        System.out.println(hit.getId());
                     }
                 }
             });
             from += pageSize;
+            if (bulkRequest.numberOfActions()> 0) {
+                BulkResponse resp = bulkRequest.get();
+                if (resp.hasFailures()) {
+                    resp.forEach(r->{
+                        System.out.println(r.getFailureMessage());
+                    });
+                }
+            }
         }
-        bulkRequest.get();
     }
 }
