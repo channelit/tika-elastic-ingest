@@ -3,6 +3,7 @@ package biz.channelit.search.ingest.web;
 import biz.channelit.search.ingest.elastic.Indexer;
 import biz.channelit.search.ingest.elastic.Setup;
 import biz.channelit.search.ingest.location.Geo;
+import biz.channelit.search.ingest.tweeter.NerTagger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,9 @@ public class IndexController {
     @Autowired
     Geo geo;
 
+    @Autowired
+    NerTagger nerTagger;
+
     @RequestMapping("/index")
     String index() throws IOException {
         indexer.indexFiles();
@@ -48,6 +52,12 @@ public class IndexController {
     @RequestMapping(path = "/ner", method = RequestMethod.GET, produces = "text/json")
     String ner(@RequestParam("index") String index, @RequestParam("type") String type, @RequestParam("q") String query) throws IOException {
         indexer.populateNer(index, type, query);
+        return "done";
+    }
+
+    @RequestMapping(path = "/tweeter", method = RequestMethod.GET, produces = "text/json")
+    String tweeter() throws IOException {
+        nerTagger.getNers("/Users/hp/workbench/projects/gmu/tweets/2017100309.txt");
         return "done";
     }
 

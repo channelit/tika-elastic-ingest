@@ -57,7 +57,7 @@ public class App {
         StanfordCoreNLP pipeline = null;
         if (corenlpEnabled) {
             Properties props = new Properties();
-            props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
+            props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref, sentiment");
             pipeline = new StanfordCoreNLP(props);
         }
         return pipeline;
@@ -65,16 +65,17 @@ public class App {
 
     @Bean
     public TransportClient esClient() throws UnknownHostException {
-        Settings settings = Settings.builder()
-                .put("cluster.name", elasticCluster).build();
-
-        if (elasticHost.equalsIgnoreCase("localhost")) {
-            return new PreBuiltTransportClient(settings)
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
-        } else {
-            return new PreBuiltTransportClient(settings)
-                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(elasticHost), 9300));
-        }
+//        Settings settings = Settings.builder()
+//                .put("cluster.name", elasticCluster).build();
+//
+//        if (elasticHost.equalsIgnoreCase("localhost")) {
+//            return new PreBuiltTransportClient(settings)
+//                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
+//        } else {
+//            return new PreBuiltTransportClient(settings)
+//                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(elasticHost), 9300));
+//        }
+        return null;
     };
 
     @Bean
