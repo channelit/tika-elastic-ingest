@@ -56,8 +56,8 @@ public class IndexController {
     }
 
     @RequestMapping(path = "/tweeter", method = RequestMethod.GET, produces = "text/json")
-    String tweeter() throws IOException {
-        nerTagger.getNers("/Users/hp/workbench/projects/gmu/tweets/2017100309.txt");
+    String tweeter(@RequestParam("file") String file) throws IOException {
+        nerTagger.getNers("/Users/hp/workbench/projects/gmu/tweets/" + file);
         return "done";
     }
 
