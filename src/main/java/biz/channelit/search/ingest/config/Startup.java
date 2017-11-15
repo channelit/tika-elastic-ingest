@@ -26,8 +26,11 @@ public class Startup {
 
     @PostConstruct
     public void init() throws IOException {
-        fileCrawler.setStartDir(Paths.get("/Users"));
+
         String fileInfo = "/Users/hp/workbench/projects/gmu/tika-elastic-ingest/fileInfo.txt";
+        String startDir = "/Users";
+
+        fileCrawler.setStartDir(Paths.get(startDir));
         fileInfoPrinter.setFilePath(Paths.get(fileInfo));
         if (Files.exists(Paths.get(fileInfo))) {
             Stream<String> dirs = Files.lines(Paths.get(fileInfo));
@@ -35,7 +38,7 @@ public class Startup {
             fileCrawler.setVisitedDir(visitedDir);
         }
 
-        Files.walkFileTree(Paths.get("/Users"), fileCrawler);
+        Files.walkFileTree(Paths.get(startDir), fileCrawler);
     }
 
 
