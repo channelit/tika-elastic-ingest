@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class Startup {
@@ -24,7 +27,13 @@ public class Startup {
     @PostConstruct
     public void init() throws IOException {
         fileCrawler.setStartDir(Paths.get("/Users"));
-        fileInfoPrinter.setFilePath(Paths.get("/Users/hp/workbench/projects/gmu/tika-elastic-ingest/fileInfo.txt"));
+        String fileInfo = "/Users/hp/workbench/projects/gmu/tika-elastic-ingest/fileInfo.txt";
+        fileInfoPrinter.setFilePath(Paths.get(fileInfo));
+        if (Files.exists(Paths.get(fileInfo))) {
+            Stream<String> dirs = Files.lines(Paths.get(fileInfo));
+            List<String> visitedDir = dirs.map(line->line.split("\\|")[2]).distinct().collect(Collectors.toList());
+            fileCrawler.setVisitedDir(visitedDir);
+        }
 
         Files.walkFileTree(Paths.get("/Users"), fileCrawler);
     }
