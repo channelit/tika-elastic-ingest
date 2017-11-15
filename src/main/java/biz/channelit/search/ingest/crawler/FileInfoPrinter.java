@@ -16,7 +16,7 @@ public class FileInfoPrinter {
     private Path filePath;
 
     public void printToFile(String... str) throws IOException {
-        Files.write(filePath, Arrays.stream(str).collect(Collectors.joining(" | ")).concat(System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        Files.write(filePath, Arrays.stream(str).collect(Collectors.joining("|")).concat(System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 
     public void setFilePath(Path filePath) throws IOException {
