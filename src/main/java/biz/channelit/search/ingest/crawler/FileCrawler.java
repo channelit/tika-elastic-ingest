@@ -26,7 +26,7 @@ public class FileCrawler implements FileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if (attrs.isRegularFile())
-        fileInfoPrinter.printToFile(file.getFileName().toString(), String.valueOf(attrs.size()));
+        fileInfoPrinter.printToFile(file.getFileName().toString(), String.valueOf(attrs.size()), file.getParent().toString());
         return FileVisitResult.CONTINUE;
     }
 
