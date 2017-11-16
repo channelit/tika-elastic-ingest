@@ -31,9 +31,10 @@ public class FileCrawler implements FileVisitor<Path> {
 
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        if (!visitedDir.contains(file.getParent().toString()))
-            if (attrs.isRegularFile())
-                fileInfoPrinter.printToFile(file.getFileName().toString(), String.valueOf(attrs.size()), file.getParent().toString());
+        if (attrs.isRegularFile()) {
+            String fileName = file.getFileName().toString();
+            fileInfoPrinter.printToFile(fileName, String.valueOf(attrs.size()), file.getParent().toString(), fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".")).toUpperCase() : "UNKNOWN");
+        }
         return FileVisitResult.CONTINUE;
     }
 
