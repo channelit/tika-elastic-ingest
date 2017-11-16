@@ -2,7 +2,9 @@ package biz.channelit.search.ingest.config;
 
 import biz.channelit.search.ingest.crawler.FileCrawler;
 import biz.channelit.search.ingest.crawler.FileInfoPrinter;
+import biz.channelit.search.ingest.scheduler.FileChanger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -23,22 +25,28 @@ public class Startup {
     @Autowired
     FileInfoPrinter fileInfoPrinter;
 
+    @Autowired
+    FileChanger fileChanger;
+
+
+    @Value("${crawler.path}")
+    String crawlerpath;
+
+    @Value("${crawler.file}")
+    String crawlerfile;
 
     @PostConstruct
     public void init() throws IOException {
 
-        String fileInfo = "/Users/hp/workbench/projects/gmu/tika-elastic-ingest/fileInfo.txt";
-        String startDir = "/Users";
+        fileChanger.changeFile();
 
-        fileCrawler.setStartDir(Paths.get(startDir));
-        fileInfoPrinter.setFilePath(Paths.get(fileInfo));
-        if (Files.exists(Paths.get(fileInfo))) {
-            Stream<String> dirs = Files.lines(Paths.get(fileInfo));
+        if (Files.exists(Paths.get(crawlerfile))) {
+            Stream<String> dirs = Files.lines(Paths.get(crawlerfile));
             List<String> visitedDir = dirs.map(line->line.split("\\|")[2]).distinct().collect(Collectors.toList());
             fileCrawler.setVisitedDir(visitedDir);
         }
 
-        Files.walkFileTree(Paths.get(startDir), fileCrawler);
+        Files.walkFileTree(Paths.get(crawlerpath), fileCrawler);
     }
 
 

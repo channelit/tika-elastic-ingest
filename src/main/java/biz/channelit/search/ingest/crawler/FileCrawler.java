@@ -1,6 +1,7 @@
 package biz.channelit.search.ingest.crawler;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,6 +19,7 @@ public class FileCrawler implements FileVisitor<Path> {
     @Autowired
     FileInfoPrinter fileInfoPrinter;
 
+    @Value("${crawler.path}")
     private Path startDir;
 
     private List<String> visitedDir = new ArrayList<>();
