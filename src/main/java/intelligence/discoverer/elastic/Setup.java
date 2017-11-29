@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.elastic;
+package intelligence.discoverer.elastic;
 
 import jdk.nashorn.internal.parser.JSONParser;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;

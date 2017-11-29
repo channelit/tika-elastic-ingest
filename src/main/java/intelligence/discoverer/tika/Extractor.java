@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.tika;
+package intelligence.discoverer.tika;
 
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;

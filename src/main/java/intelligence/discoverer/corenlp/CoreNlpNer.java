@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.corenlp;
+package intelligence.discoverer.corenlp;
 
 import edu.stanford.nlp.dcoref.CorefChain;
 import edu.stanford.nlp.dcoref.CorefCoreAnnotations.CorefChainAnnotation;

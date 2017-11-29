@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.image;
+package intelligence.discoverer.image;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

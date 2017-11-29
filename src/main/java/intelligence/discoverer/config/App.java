@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.config;
+package intelligence.discoverer.config;
 
 import com.asprise.ocr.Ocr;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
@@ -10,9 +10,6 @@ import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -25,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 

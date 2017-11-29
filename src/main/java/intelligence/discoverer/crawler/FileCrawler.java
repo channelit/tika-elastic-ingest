@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.crawler;
+package intelligence.discoverer.crawler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

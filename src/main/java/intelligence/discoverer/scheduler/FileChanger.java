@@ -1,7 +1,6 @@
-package biz.channelit.search.ingest.scheduler;
+package intelligence.discoverer.scheduler;
 
-import biz.channelit.search.ingest.crawler.FileCrawler;
-import biz.channelit.search.ingest.crawler.FileInfoPrinter;
+import intelligence.discoverer.crawler.FileInfoPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;

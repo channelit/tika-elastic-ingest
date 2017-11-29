@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.location;
+package intelligence.discoverer.location;
 
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;

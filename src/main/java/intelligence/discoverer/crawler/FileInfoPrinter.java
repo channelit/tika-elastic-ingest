@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.crawler;
+package intelligence.discoverer.crawler;
 
 import org.springframework.stereotype.Service;
 

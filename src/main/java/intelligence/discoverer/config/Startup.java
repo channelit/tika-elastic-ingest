@@ -1,8 +1,8 @@
-package biz.channelit.search.ingest.config;
+package intelligence.discoverer.config;
 
-import biz.channelit.search.ingest.crawler.FileCrawler;
-import biz.channelit.search.ingest.crawler.FileInfoPrinter;
-import biz.channelit.search.ingest.scheduler.FileChanger;
+import intelligence.discoverer.crawler.FileCrawler;
+import intelligence.discoverer.crawler.FileInfoPrinter;
+import intelligence.discoverer.scheduler.FileChanger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;

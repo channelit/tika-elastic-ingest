@@ -1,9 +1,9 @@
-package biz.channelit.search.ingest.web;
+package intelligence.discoverer.web;
 
-import biz.channelit.search.ingest.elastic.Indexer;
-import biz.channelit.search.ingest.elastic.Setup;
-import biz.channelit.search.ingest.location.Geo;
-import biz.channelit.search.ingest.tweeter.NerTagger;
+import intelligence.discoverer.elastic.Indexer;
+import intelligence.discoverer.elastic.Setup;
+import intelligence.discoverer.location.Geo;
+import intelligence.discoverer.tweeter.NerTagger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;

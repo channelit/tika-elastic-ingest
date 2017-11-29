@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.opennlp;
+package intelligence.discoverer.opennlp;
 
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;

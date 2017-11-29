@@ -1,4 +1,4 @@
-package biz.channelit.search.ingest.tweeter;
+package intelligence.discoverer.tweeter;
 
 import edu.stanford.nlp.coref.CorefCoreAnnotations;
 import edu.stanford.nlp.coref.data.CorefChain;
