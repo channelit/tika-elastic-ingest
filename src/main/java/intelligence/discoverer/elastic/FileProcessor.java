@@ -5,7 +5,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import intelligence.discoverer.elastic.EntityTransformer;
+import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
+import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.geo.GeoPoint;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -37,12 +39,11 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 @Service
 public class FileProcessor {
 
+    @Autowired
+    BulkProcessor bulkProcessor;
 
     @Autowired
     RestTemplate restTemplate;
-
-    @Autowired
-    TransportClient client;
 
     @Value("${crawler.path}")
     String crawlerpath;
@@ -64,8 +65,6 @@ public class FileProcessor {
 
 
     public void processFile(Path filePath) throws IOException {
-        BulkRequestBuilder bulkRequest = client.prepareBulk();
-
         byte[] bFile = Files.readAllBytes(filePath);
         ByteArrayResource resource = new ByteArrayResource(bFile) {
             @Override
@@ -74,27 +73,16 @@ public class FileProcessor {
             }
         };
 
-        MultiValueMap<String, Object> data = new LinkedMultiValueMap<>();
-        data.add("file", resource);
-
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-
-        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+        MultiValueMap<String, Object> data = new LinkedMultiValueMap<>();
+        data.add("file", resource);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(data, headers);
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
+        String resp = responseEntity.getBody();
+        Map<String, Object> map = entityTransformer.getFieldValues(resp);
+        bulkProcessor.add(new IndexRequest(defaultIndex, defaultType).source(map));
 
-//        try {
-            ResponseEntity<String> responseEntity =
-                    restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
-            String resp = responseEntity.getBody();
-            Map<String, Object> map = entityTransformer.getFieldValues(resp);
-
-            bulkRequest.add(client.prepareIndex(defaultIndex, defaultType)
-                    .setSource(map));
-
-//        } catch (Exception e) {
-//            e.getMessage();
-//            e.printStackTrace();
-//        }
     }
 }

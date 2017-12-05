@@ -2,7 +2,6 @@ package intelligence.discoverer.config;
 
 import com.asprise.ocr.Ocr;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import intelligence.discoverer.elastic.EntityTransformer;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.sentdetect.SentenceDetectorME;
@@ -10,7 +9,19 @@ import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
+import org.elasticsearch.action.bulk.BackoffPolicy;
+import org.elasticsearch.action.bulk.BulkProcessor;
+import org.elasticsearch.action.bulk.BulkRequest;
+import org.elasticsearch.action.bulk.BulkResponse;
 import org.elasticsearch.client.transport.TransportClient;
+import org.elasticsearch.common.settings.Settings;
+import org.elasticsearch.common.transport.TransportAddress;
+import org.elasticsearch.common.unit.ByteSizeUnit;
+import org.elasticsearch.common.unit.ByteSizeValue;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -18,34 +29,30 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.stereotype.Component;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Properties;
 
-@Controller
+@Component
 @EnableAutoConfiguration
 @EnableScheduling
-@ComponentScan("biz.channelit.search.ingest")
+@ComponentScan("intelligence.discoverer")
 public class App {
 
     @Value("${elastic.cluster.name}")
-    String elasticCluster;
+    static String elasticCluster;
 
     @Value("${elastic.host.name}")
-    String elasticHost;
+    static String elasticHost;
 
     @Value("${nlp.corenlp.enabled}")
-    Boolean corenlpEnabled;
-
-    @RequestMapping("/status")
-    @ResponseBody
-    String home() throws IOException {
-        return "Indexer!";
-    }
+    static Boolean corenlpEnabled;
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(App.class, args);
@@ -62,19 +69,13 @@ public class App {
         return pipeline;
     }
 
-    @Bean
+    @Bean(name="esclient")
     public TransportClient esClient() throws UnknownHostException {
-//        Settings settings = Settings.builder()
-//                .put("cluster.name", elasticCluster).build();
-//
-//        if (elasticHost.equalsIgnoreCase("localhost")) {
-//            return new PreBuiltTransportClient(settings)
-//                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getLocalHost(), 9300));
-//        } else {
-//            return new PreBuiltTransportClient(settings)
-//                    .addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName(elasticHost), 9300));
-//        }
-        return null;
+        Settings settings = Settings.builder()
+                .put("cluster.name", elasticCluster).build();
+        TransportClient client =  new PreBuiltTransportClient(settings)
+                .addTransportAddress(new TransportAddress(InetAddress.getByName(elasticHost), 9300));
+        return client;
     };
 
     @Bean
@@ -123,6 +124,35 @@ public class App {
         Ocr ocr = new Ocr(); // create a new OCR engine
         ocr.startEngine("eng", Ocr.SPEED_FASTEST); // English
         return ocr;
+    }
+
+    @Bean
+    public BulkProcessor bulkProcessor(@Autowired TransportClient client) {
+        BulkProcessor bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
+            @Override
+            public void beforeBulk(long l, BulkRequest bulkRequest) {
+
+            }
+
+            @Override
+            public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
+
+            }
+
+            @Override
+            public void afterBulk(long l, BulkRequest bulkRequest, Throwable throwable) {
+
+            }
+        })
+                .setBulkActions(1000)
+                .setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB))
+                .setFlushInterval(TimeValue.timeValueSeconds(5))
+                .setConcurrentRequests(5)
+                .setBackoffPolicy(
+                        BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)
+                )
+                .build();
+        return bulkProcessor;
     }
 
 }
