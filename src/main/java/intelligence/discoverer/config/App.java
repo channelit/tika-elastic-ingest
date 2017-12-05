@@ -2,6 +2,7 @@ package intelligence.discoverer.config;
 
 import com.asprise.ocr.Ocr;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import intelligence.discoverer.elastic.EntityTransformer;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.sentdetect.SentenceDetectorME;

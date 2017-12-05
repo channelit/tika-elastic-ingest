@@ -1,9 +1,10 @@
-package gov.dhs.cbp.afi.ext.elastic;
+package intelligence.discoverer.elastic;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import intelligence.discoverer.elastic.EntityTransformer;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.geo.GeoPoint;
@@ -29,6 +30,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
@@ -54,6 +56,9 @@ public class FileProcessor {
     @Value("${parser.url}")
     String parserUrl;
 
+    @Autowired
+    EntityTransformer entityTransformer;
+
     private final UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(parserUrl);
     private final URI uri = builder.build().encode().toUri();
 
@@ -68,6 +73,7 @@ public class FileProcessor {
                 return filePath.getFileName().toString();
             }
         };
+
         MultiValueMap<String, Object> data = new LinkedMultiValueMap<>();
         data.add("file", resource);
 
@@ -77,38 +83,18 @@ public class FileProcessor {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(data, headers);
 
-        try {
+//        try {
             ResponseEntity<String> responseEntity =
                     restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
             String resp = responseEntity.getBody();
-            System.out.println(resp);
+            Map<String, Object> map = entityTransformer.getFieldValues(resp);
 
-            JsonParser parser = new JsonParser();
-            JsonObject o = parser.parse(resp).getAsJsonObject();
-
-            List<String> person = new ArrayList<>();
-            List<String> company = new ArrayList<>();
-            List<String> place = new ArrayList<>();
-            List<GeoPoint> geoPoint = new ArrayList<>();
-            XContentBuilder jsonDoc = jsonBuilder()
-                    .startObject()
-                    .field("body", o.get("text").getAsString())
-                    .field("insertDate", new Date())
-                    .field("file",o.get("fileName").getAsString())
-                    .field("url", "text")
-                    .field("filetype", "text")
-                    .field("person",person)
-                    .field("company", company)
-                    .field("place", place)
-                    .field("location", geoPoint)
-                    .endObject();
             bulkRequest.add(client.prepareIndex(defaultIndex, defaultType)
-                    .setSource(jsonDoc));
-            bulkRequest.get();
+                    .setSource(map));
 
-        } catch (Exception e) {
-            e.getMessage();
-            e.printStackTrace();
-        }
+//        } catch (Exception e) {
+//            e.getMessage();
+//            e.printStackTrace();
+//        }
     }
 }
