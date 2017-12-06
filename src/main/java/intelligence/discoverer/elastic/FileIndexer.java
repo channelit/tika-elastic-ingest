@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Map;
 
 @Service
 public class FileIndexer {
@@ -31,7 +33,15 @@ public class FileIndexer {
     @Autowired
     EntityExtractorClient entityExtractorClient;
 
-    public void indexFile(Path file) throws IOException {
-        bulkProcessor.add(new IndexRequest(defaultIndex, defaultType).source(entityExtractorClient.processFile(file)));
+    public String indexFile(Path file, BasicFileAttributes attrs) throws IOException {
+        Map<String, Object> map = entityExtractorClient.processFile(file);
+        map.put("size", attrs.size());
+        map.put("lastAccessTime", attrs.lastAccessTime());
+        map.put("createTime", attrs.creationTime());
+        map.put("fullPath", file.getFileName());
+        map.put("lastModifiedTime", attrs.lastModifiedTime());
+
+        bulkProcessor.add(new IndexRequest(defaultIndex, defaultType).source(map));
+        return "ok";
     }
 }

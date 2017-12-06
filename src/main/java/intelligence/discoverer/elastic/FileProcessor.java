@@ -15,15 +15,16 @@ public class FileProcessor {
     @Autowired
     FileInfoPrinter fileInfoPrinter;
 
+    @Autowired
+    FileIndexer fileIndexer;
+
 
     @Async
     public CompletableFuture<String> processFile(Path file, BasicFileAttributes attrs) throws IOException {
         String fileName = file.getFileName().toString();
         fileInfoPrinter.printToFile(fileName, String.valueOf(attrs.size()), file.getParent().toString(), fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".")).toUpperCase() : "UNKNOWN");
-
-
-        String results = "";
-
+        fileIndexer.indexFile(file, attrs);
+        String results = fileIndexer.indexFile(file, attrs);
         return CompletableFuture.completedFuture(results);
     }
 }
