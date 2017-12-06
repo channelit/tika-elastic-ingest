@@ -8,6 +8,7 @@ import org.apache.tika.parser.Parser;
 import org.apache.tika.parser.ocr.TesseractOCRConfig;
 import org.apache.tika.parser.pdf.PDFParserConfig;
 import org.apache.tika.sax.BodyContentHandler;
+import org.springframework.web.multipart.MultipartFile;
 import org.xml.sax.SAXException;
 
 import java.io.*;
@@ -16,7 +17,16 @@ import java.io.*;
  * Created by hp on 2/20/17.
  */
 public class Extractor {
-    public static String extractFileContet(File file) {
+    public static String extractFileContent(File file) {
+        try {
+            return extractFileContent(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String extractFileContent(InputStream stream) {
         Parser parser = new AutoDetectParser();
         BodyContentHandler handler = new BodyContentHandler(-1);
 
@@ -30,10 +40,8 @@ public class Extractor {
         //need to add this to make sure recursive parsing happens!
         parseContext.set(Parser.class, parser);
 
-
-
         Metadata metadata = new Metadata();
-        try (InputStream stream = new FileInputStream(file)) {
+        try {
             parser.parse(stream, handler, metadata, parseContext);
             return handler.toString();
         } catch (IOException | TikaException | SAXException e) {

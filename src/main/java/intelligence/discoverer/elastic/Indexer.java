@@ -119,7 +119,7 @@ public class Indexer {
     }
 
     private String extractFileContet(File file) {
-        return Extractor.extractFileContet(file);
+        return Extractor.extractFileContent(file);
     }
 
     private String extractImageContent(File file) {
