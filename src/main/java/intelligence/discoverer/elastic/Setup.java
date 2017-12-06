@@ -1,8 +1,6 @@
 package intelligence.discoverer.elastic;
 
-import jdk.nashorn.internal.parser.JSONParser;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.mapping.put.PutMappingResponse;
 import org.elasticsearch.client.transport.TransportClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,8 +10,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-
-import static org.openxmlformats.schemas.spreadsheetml.x2006.main.STBorderStyle.type;
 
 /**
  * Created by hp on 2/17/17.

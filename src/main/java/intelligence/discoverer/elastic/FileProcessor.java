@@ -1,16 +1,12 @@
 package intelligence.discoverer.elastic;
 
-import org.elasticsearch.action.bulk.BulkProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 @Service

@@ -41,6 +41,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.net.ssl.SSLContext;
 import java.io.File;
@@ -48,6 +49,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.URI;
 import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -73,6 +75,9 @@ public class App {
 
     @Value("${nlp.corenlp.enabled}")
     Boolean corenlpEnabled;
+
+    @Value("${parser.url}")
+    String parserUrl;
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(App.class, args);
@@ -203,5 +208,11 @@ public class App {
         executor.setQueueCapacity(10);
         executor.setThreadFactory(threadFactory);
         return executor;
+    }
+
+    @Bean
+    public URI getUri() {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(parserUrl);
+        return builder.build().encode().toUri();
     }
 }

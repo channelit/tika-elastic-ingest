@@ -10,9 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Date;
-
-import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
 
 @Service
 public class FileIndexer {
