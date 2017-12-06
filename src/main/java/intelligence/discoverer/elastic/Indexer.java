@@ -28,6 +28,7 @@ import static org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder;
  * Created by hp on 2/14/17.
  */
 
+@Deprecated
 @Service
 public class Indexer {
 
@@ -163,7 +164,7 @@ public class Indexer {
             hasMore = (searchResponse.getHits().getHits().length > 0);
             BulkRequestBuilder bulkRequest = client.prepareBulk();
             searchResponse.getHits().forEach((hit) -> {
-                Map source = hit.getSource();
+                Map source = hit.getSourceAsMap();
                 String content = (String) source.get("body");
                 if (content.trim().length() > 0) {
                     Map<String, List<String>> map = openNlpNer.getAll(content);

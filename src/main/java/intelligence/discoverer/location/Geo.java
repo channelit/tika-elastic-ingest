@@ -61,8 +61,8 @@ public class Geo {
         SearchResponse response = client.prepareSearch("geo").setTypes("us").setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
                 .setQuery(qb).setFetchSource("location", null)
                 .setSize(10).get();
-        if (response.getHits().hits().length > 0) {
-            String out = response.getHits().getAt(0).getSource().get("location").toString();
+        if (response.getHits().getHits().length > 0) {
+            String out = response.getHits().getAt(0).getSourceAsMap().get("location").toString();
             out = out.substring(1, out.length()-1);
             double lat =  new Double(out.split(",")[0]);
             double lon =  new Double(out.split(",")[1]);

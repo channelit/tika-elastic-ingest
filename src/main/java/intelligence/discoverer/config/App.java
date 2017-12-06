@@ -1,6 +1,7 @@
 package intelligence.discoverer.config;
 
 import com.asprise.ocr.Ocr;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
@@ -9,6 +10,10 @@ import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.elasticsearch.action.bulk.BackoffPolicy;
 import org.elasticsearch.action.bulk.BulkProcessor;
 import org.elasticsearch.action.bulk.BulkRequest;
@@ -21,38 +26,53 @@ import org.elasticsearch.common.unit.ByteSizeValue;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
+import javax.net.ssl.SSLContext;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.util.Properties;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Component
 @EnableAutoConfiguration
 @EnableScheduling
 @ComponentScan("intelligence.discoverer")
+@EnableAsync
 public class App {
 
     @Value("${elastic.cluster.name}")
-    static String elasticCluster;
+    String elasticCluster;
 
     @Value("${elastic.host.name}")
-    static String elasticHost;
+    String elasticHost;
 
     @Value("${nlp.corenlp.enabled}")
-    static Boolean corenlpEnabled;
+    Boolean corenlpEnabled;
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(App.class, args);
@@ -69,14 +89,14 @@ public class App {
         return pipeline;
     }
 
-    @Bean(name="esclient")
+    @Bean(name = "esclient")
     public TransportClient esClient() throws UnknownHostException {
         Settings settings = Settings.builder()
                 .put("cluster.name", elasticCluster).build();
-        TransportClient client =  new PreBuiltTransportClient(settings)
+        TransportClient client = new PreBuiltTransportClient(settings)
                 .addTransportAddress(new TransportAddress(InetAddress.getByName(elasticHost), 9300));
         return client;
-    };
+    }
 
     @Bean
     public Tokenizer tokenizer() throws IOException {
@@ -109,6 +129,7 @@ public class App {
         is.close();
         return new NameFinderME(model);
     }
+
     @Bean
     public SentenceDetectorME sentenceDetectorME() throws IOException {
         File file = new ClassPathResource("opennlp/en-sent.bin").getFile();
@@ -126,7 +147,8 @@ public class App {
         return ocr;
     }
 
-    @Bean
+    @Bean("esBulkProcessor")
+    @Scope("prototype")
     public BulkProcessor bulkProcessor(@Autowired TransportClient client) {
         BulkProcessor bulkProcessor = BulkProcessor.builder(client, new BulkProcessor.Listener() {
             @Override
@@ -154,27 +176,32 @@ public class App {
                 .build();
         return bulkProcessor;
     }
-    
+
     @Bean
     public RestTemplate restTemplate() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException {
         TrustStrategy acceptingTrustStrategy = (X509Certificate[] chain, String authType) -> true;
-
         SSLContext sslContext = org.apache.http.ssl.SSLContexts.custom()
                 .loadTrustMaterial(null, acceptingTrustStrategy)
                 .build();
-
         SSLConnectionSocketFactory csf = new SSLConnectionSocketFactory(sslContext);
-
         CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLSocketFactory(csf)
                 .build();
-
         HttpComponentsClientHttpRequestFactory requestFactory =
                 new HttpComponentsClientHttpRequestFactory();
-
         requestFactory.setHttpClient(httpClient);
-
         return new RestTemplate(requestFactory);
     }
 
+    @Bean
+    public Executor taskExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        final ThreadFactory threadFactory = new ThreadFactoryBuilder()
+                .setNameFormat(this.getClass().getSimpleName() + "-%d").build();
+        executor.setCorePoolSize(4);
+        executor.setMaxPoolSize(4);
+        executor.setQueueCapacity(10);
+        executor.setThreadFactory(threadFactory);
+        return executor;
+    }
 }

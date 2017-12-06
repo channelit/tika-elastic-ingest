@@ -1,6 +1,6 @@
 package intelligence.discoverer.scheduler;
 
-import intelligence.discoverer.crawler.FileInfoPrinter;
+import intelligence.discoverer.elastic.FileInfoPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;

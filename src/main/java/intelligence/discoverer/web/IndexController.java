@@ -1,5 +1,6 @@
 package intelligence.discoverer.web;
 
+import intelligence.discoverer.crawler.FileCrawler;
 import intelligence.discoverer.elastic.Indexer;
 import intelligence.discoverer.elastic.Setup;
 import intelligence.discoverer.location.Geo;
@@ -31,6 +32,9 @@ public class IndexController {
     @Autowired
     NerTagger nerTagger;
 
+    @Autowired
+    FileCrawler crawler;
+
     @RequestMapping("/index")
     String index() throws IOException {
         indexer.indexFiles();
@@ -58,6 +62,12 @@ public class IndexController {
     @RequestMapping(path = "/tweeter", method = RequestMethod.GET, produces = "text/json")
     String tweeter(@RequestParam("file") String file) throws IOException {
         nerTagger.getNers("/Users/hp/workbench/projects/gmu/tweets/" + file);
+        return "done";
+    }
+
+    @RequestMapping(path = "/crawler", method = RequestMethod.GET, produces = "text/json")
+    String crawler() throws IOException {
+        crawler.startCrawler();
         return "done";
     }
 

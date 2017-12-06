@@ -1,7 +1,7 @@
 package intelligence.discoverer.config;
 
 import intelligence.discoverer.crawler.FileCrawler;
-import intelligence.discoverer.crawler.FileInfoPrinter;
+import intelligence.discoverer.elastic.FileInfoPrinter;
 import intelligence.discoverer.scheduler.FileChanger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +34,7 @@ public class Startup {
     @Value("${crawler.file}")
     String crawlerfile;
 
-    @PostConstruct
+//    @PostConstruct
     public void init() throws IOException {
 
         fileChanger.changeFile();

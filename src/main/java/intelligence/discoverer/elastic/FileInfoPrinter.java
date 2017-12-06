@@ -1,5 +1,6 @@
-package intelligence.discoverer.crawler;
+package intelligence.discoverer.elastic;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -15,6 +16,7 @@ public class FileInfoPrinter {
 
     private Path filePath;
 
+    @Async
     public void printToFile(String... str) throws IOException {
         Files.write(filePath, Arrays.stream(str).collect(Collectors.joining("|")).concat(System.lineSeparator()).getBytes(), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
