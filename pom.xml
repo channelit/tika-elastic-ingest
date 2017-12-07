@@ -94,6 +94,11 @@
             <artifactId>java-ocr-api</artifactId>
             <version>[15,)</version>
         </dependency>
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.18</version>
+        </dependency>
 
     </dependencies>
 </project>
