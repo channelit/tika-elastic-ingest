@@ -171,7 +171,7 @@ public class App {
 
             }
         })
-                .setBulkActions(1000)
+                .setBulkActions(5)
                 .setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB))
                 .setFlushInterval(TimeValue.timeValueSeconds(5))
                 .setConcurrentRequests(5)
@@ -205,7 +205,7 @@ public class App {
                 .setNameFormat(this.getClass().getSimpleName() + "-%d").build();
         executor.setCorePoolSize(4);
         executor.setMaxPoolSize(4);
-        executor.setQueueCapacity(10);
+//        executor.setQueueCapacity(10);
         executor.setThreadFactory(threadFactory);
         return executor;
     }

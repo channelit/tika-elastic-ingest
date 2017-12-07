@@ -14,7 +14,7 @@
   "mappings": {
     "hackathon": {
       "properties": {
-        "body": {
+        "content": {
           "type": "text",
           "analyzer": "tika_body"
         },
@@ -25,19 +25,16 @@
           "type": "keyword"
         },
         "size": {
-          "type": "keyword"
+          "type": "long"
         },
         "author": {
           "type": "keyword"
         },
-        "names": {
+        "person": {
           "type": "keyword"
         },
-        "locations": {
-          "type": "text"
-        },
-        "companies": {
-          "type": "text"
+        "company": {
+          "type": "keyword"
         },
         "location": {
           "type": "geo_point"

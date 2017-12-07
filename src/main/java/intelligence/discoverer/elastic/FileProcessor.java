@@ -21,7 +21,7 @@ public class FileProcessor {
     FileIndexer fileIndexer;
 
 
-    @Async
+//    @Async
     public CompletableFuture<String> processFile(Path file, BasicFileAttributes attrs) throws IOException {
         String fileName = file.getFileName().toString();
         fileInfoPrinter.printToFile(fileName, String.valueOf(attrs.size()), file.getParent().toString(), fileName.contains(".") ? fileName.substring(fileName.lastIndexOf(".")).toUpperCase() : "UNKNOWN");
@@ -31,7 +31,7 @@ public class FileProcessor {
     }
 
     public void processFileLocal(MultipartFile file) throws IOException {
-        Extractor.extractFileContent(file.getInputStream());
+        fileIndexer.indexFileLocal(file);
     }
 
 }
