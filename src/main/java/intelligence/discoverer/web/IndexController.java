@@ -4,6 +4,7 @@ import intelligence.discoverer.crawler.FileCrawler;
 import intelligence.discoverer.elastic.Indexer;
 import intelligence.discoverer.elastic.Setup;
 import intelligence.discoverer.location.Geo;
+import intelligence.discoverer.scheduler.FileChanger;
 import intelligence.discoverer.tweeter.NerTagger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,9 @@ public class IndexController {
 
     @Autowired
     FileCrawler crawler;
+
+    @Autowired
+    FileChanger fileChanger;
 
     @RequestMapping("/index")
     String index() throws IOException {
@@ -67,6 +71,7 @@ public class IndexController {
 
     @RequestMapping(path = "/crawler", method = RequestMethod.GET, produces = "text/json")
     String crawler() throws IOException {
+        fileChanger.changeFile();
         crawler.startCrawler();
         return "done";
     }
