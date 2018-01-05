@@ -72,8 +72,11 @@ public class App {
     @Value("${elastic.cluster.name}")
     String elasticCluster;
 
-    @Value("${elastic.host.name}")
+    @Value("${elastic.host}")
     String elasticHost;
+
+    @Value("${elastic.port}")
+    Integer elasticPort;
 
     @Value("${nlp.corenlp.enabled}")
     Boolean corenlpEnabled;
@@ -101,7 +104,7 @@ public class App {
         Settings settings = Settings.builder()
                 .put("cluster.name", elasticCluster).build();
         TransportClient client = new PreBuiltTransportClient(settings)
-                .addTransportAddress(new TransportAddress(InetAddress.getByName(elasticHost), 9300));
+                .addTransportAddress(new TransportAddress(InetAddress.getByName(elasticHost), elasticPort));
         return client;
     }
 
