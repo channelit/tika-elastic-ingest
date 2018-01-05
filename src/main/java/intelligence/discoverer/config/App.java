@@ -3,6 +3,7 @@ package intelligence.discoverer.config;
 import com.asprise.ocr.Ocr;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import intelligence.discoverer.web.AfiResponseErrorHandler;
 import opennlp.tools.namefind.NameFinderME;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.sentdetect.SentenceDetectorME;
@@ -200,7 +201,9 @@ public class App {
         HttpComponentsClientHttpRequestFactory requestFactory =
                 new HttpComponentsClientHttpRequestFactory();
         requestFactory.setHttpClient(httpClient);
-        return new RestTemplate(requestFactory);
+        RestTemplate restTemplate = new RestTemplate(requestFactory);
+        restTemplate.setErrorHandler(new AfiResponseErrorHandler());
+        return restTemplate;
     }
 
     @Bean
