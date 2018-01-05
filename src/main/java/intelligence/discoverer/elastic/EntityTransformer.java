@@ -12,7 +12,7 @@ import java.util.*;
 public class EntityTransformer {
 
 
-    public Map<String,Object> getFieldValues(String json) {
+    public Map<String, Object> getFieldValues(String json) {
         JsonParser parser = new JsonParser();
         JsonObject o = parser.parse(json).getAsJsonObject();
         Map<String, List<?>> fieldVal = new HashMap<>();

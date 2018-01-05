@@ -59,6 +59,8 @@ public class EntityExtractorClient {
         if (!responseEntity.getStatusCode().is5xxServerError()) {
             String resp = responseEntity.getBody();
             map = entityTransformer.getFieldValues(resp);
+        } else {
+            map.put("error", "500");
         }
         return map;
 
