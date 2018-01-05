@@ -48,7 +48,7 @@ public class EntityExtractorClient {
                 return filePath.getFileName().toString();
             }
         };
-
+        Map<String, Object> map = null;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> data = new LinkedMultiValueMap<>();
@@ -56,8 +56,10 @@ public class EntityExtractorClient {
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(data, headers);
         ResponseEntity<String> responseEntity =
                 restTemplate.exchange(uri, HttpMethod.POST, requestEntity, String.class);
-        String resp = responseEntity.getBody();
-        Map<String, Object> map = entityTransformer.getFieldValues(resp);
+        if (!responseEntity.getStatusCode().is5xxServerError()) {
+            String resp = responseEntity.getBody();
+            map = entityTransformer.getFieldValues(resp);
+        }
         return map;
 
     }
