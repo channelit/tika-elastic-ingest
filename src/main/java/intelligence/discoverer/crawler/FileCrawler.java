@@ -1,7 +1,5 @@
 package intelligence.discoverer.crawler;
 
-import intelligence.discoverer.elastic.FileInfoPrinter;
-import intelligence.discoverer.elastic.EntityExtractorClient;
 import intelligence.discoverer.elastic.FileProcessor;
 import intelligence.discoverer.scheduler.FileChanger;
 import org.springframework.beans.factory.annotation.Autowired;

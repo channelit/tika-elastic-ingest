@@ -1,6 +1,6 @@
 package intelligence.discoverer.scheduler;
 
-import intelligence.discoverer.elastic.FileInfoPrinter;
+import intelligence.discoverer.elastic.FileInfoLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -15,7 +15,7 @@ import java.util.Date;
 public class FileChanger {
 
     @Autowired
-    FileInfoPrinter fileInfoPrinter;
+    FileInfoLogger fileInfoLogger;
 
     @Value("${crawler.file}")
     String crawlerfile;
@@ -23,7 +23,7 @@ public class FileChanger {
     @Scheduled(fixedDelay = 60000, initialDelay = 0)
     public void changeFile() throws IOException {
         String suffix = new SimpleDateFormat("yyyyMMddHH'.txt'").format(new Date());;
-        fileInfoPrinter.setFilePath(Paths.get(crawlerfile.replace(".txt", suffix)));
+        fileInfoLogger.setFilePath(Paths.get(crawlerfile.replace(".txt", suffix)));
     }
 
 }

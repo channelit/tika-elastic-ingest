@@ -1,13 +1,12 @@
 package intelligence.discoverer.config;
 
 import intelligence.discoverer.crawler.FileCrawler;
-import intelligence.discoverer.elastic.FileInfoPrinter;
+import intelligence.discoverer.elastic.FileInfoLogger;
 import intelligence.discoverer.scheduler.FileChanger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -22,7 +21,7 @@ public class Startup {
     FileCrawler fileCrawler;
 
     @Autowired
-    FileInfoPrinter fileInfoPrinter;
+    FileInfoLogger fileInfoLogger;
 
     @Autowired
     FileChanger fileChanger;
