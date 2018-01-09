@@ -39,11 +39,11 @@ public class FileIndexer {
 
     public String indexFile(Path file, BasicFileAttributes attrs) throws IOException {
         Map<String, Object> map = entityExtractorClient.processFile(file);
-        map.put("size", attrs.size());
-        map.put("lastAccessTime", attrs.lastAccessTime());
-        map.put("createTime", attrs.creationTime());
-        map.put("fullPath", file.getFileName());
-        map.put("lastModifiedTime", attrs.lastModifiedTime());
+        map.put("file_size", attrs.size());
+        map.put("file_accessed", attrs.lastAccessTime());
+        map.put("file_created", attrs.creationTime());
+        map.put("file_url", file.getFileName());
+        map.put("file_modified", attrs.lastModifiedTime());
         bulkProcessor.add(new IndexRequest(defaultIndex, defaultType).source(map));
         return "ok";
     }
