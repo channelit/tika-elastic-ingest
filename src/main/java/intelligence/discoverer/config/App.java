@@ -179,11 +179,11 @@ public class App {
         })
                 .setBulkActions(5)
                 .setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB))
-                .setFlushInterval(TimeValue.timeValueSeconds(5))
-                .setConcurrentRequests(5)
-                .setBackoffPolicy(
-                        BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)
-                )
+//                .setFlushInterval(TimeValue.timeValueSeconds(5))
+//                .setConcurrentRequests(5)
+//                .setBackoffPolicy(
+//                        BackoffPolicy.exponentialBackoff(TimeValue.timeValueMillis(100), 3)
+//                )
                 .build();
         return bulkProcessor;
     }
