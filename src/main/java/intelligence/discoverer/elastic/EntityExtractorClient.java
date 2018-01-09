@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
 
 @Service
@@ -48,7 +49,7 @@ public class EntityExtractorClient {
                 return filePath.getFileName().toString();
             }
         };
-        Map<String, Object> map = null;
+        Map<String, Object> map = new HashMap<>();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
         MultiValueMap<String, Object> data = new LinkedMultiValueMap<>();
