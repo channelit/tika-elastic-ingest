@@ -169,7 +169,9 @@ public class App {
 
             @Override
             public void afterBulk(long l, BulkRequest bulkRequest, BulkResponse bulkResponse) {
-                System.out.println(bulkResponse.buildFailureMessage());
+                if (bulkResponse.hasFailures()) {
+                    System.out.println(bulkResponse.buildFailureMessage());
+                }
             }
 
             @Override
