@@ -1,5 +1,6 @@
 package intelligence.discoverer.crawler;
 
+import intelligence.discoverer.elastic.FileInfoLogger;
 import intelligence.discoverer.elastic.FileProcessor;
 import intelligence.discoverer.scheduler.FileChanger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ public class FileCrawler implements FileVisitor<Path> {
     @Autowired
     FileChanger fileChanger;
 
+    @Autowired
+    FileInfoLogger fileInfoLogger;
 
     @Value("${crawler.path}")
     String crawlerpath;
@@ -46,7 +49,9 @@ public class FileCrawler implements FileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if (attrs.isRegularFile()) {
-            fileProcessor.processFile(file, attrs);
+            if (!fileInfoLogger.fileIndexed(file.getFileName().toString())) {
+                fileProcessor.processFile(file, attrs);
+            }
         }
         return FileVisitResult.CONTINUE;
     }

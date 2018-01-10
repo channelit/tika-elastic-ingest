@@ -15,11 +15,7 @@ public class EntityTransformer {
     public Map<String, Object> getFieldValues(String json) {
         JsonParser parser = new JsonParser();
         JsonObject o = parser.parse(json).getAsJsonObject();
-        Map<String, List<?>> fieldVal = new HashMap<>();
-        String type = o.get("type").getAsString();
-        switch (type){
-
-        }
-        return new HashMap<>();
+        Map<String, Object> fieldVal = new HashMap<>();
+        return fieldVal;
     }
 }
