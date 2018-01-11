@@ -16,6 +16,9 @@ public class EntityTransformer {
         JsonParser parser = new JsonParser();
         JsonObject o = parser.parse(json).getAsJsonObject();
         Map<String, Object> fieldVal = new HashMap<>();
+        o.keySet().forEach(key->{
+            fieldVal.put(key, o.get(key));
+        });
         return fieldVal;
     }
 }

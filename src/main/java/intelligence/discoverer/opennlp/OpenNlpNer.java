@@ -56,6 +56,7 @@ public class OpenNlpNer {
                     out.put("companies", findNer(orgNameFinder, tokens));
                     out.put("locations", findNer(locationFinder, tokens));
                     out.put("ner", new ArrayList<>());
+                    out.put("text", Arrays.asList(text));
                 }
             }
         } catch (Exception e) {
