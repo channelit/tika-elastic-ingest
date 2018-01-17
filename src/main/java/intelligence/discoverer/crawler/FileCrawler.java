@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,6 +42,10 @@ public class FileCrawler implements FileVisitor<Path> {
     @Value("${crawler.file}")
     String crawlerfile;
 
+    @Value("${crawler.filter}")
+    String[] crawlerfilter;
+
+
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
         return FileVisitResult.CONTINUE;
@@ -49,8 +54,12 @@ public class FileCrawler implements FileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
         if (attrs.isRegularFile()) {
-            if (!fileInfoLogger.fileIndexed(file.getFileName().toString())) {
-                fileProcessor.processFile(file, attrs);
+            String filename = file.getFileName().toString().toLowerCase();
+            String ext = filename.indexOf(".") > 0 ? filename.substring(filename.lastIndexOf(".")) : "--";
+            if (Arrays.asList(crawlerfilter).contains(ext)) {
+                if (!fileInfoLogger.fileIndexed(file.getFileName().toString())) {
+                    fileProcessor.processFile(file, attrs);
+                }
             }
         }
         return FileVisitResult.CONTINUE;
