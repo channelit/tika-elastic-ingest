@@ -42,7 +42,7 @@ public class FileIndexer {
         map.put("file_size", attrs.size());
         map.put("file_accessed", attrs.lastAccessTime());
         map.put("file_created", attrs.creationTime());
-        map.put("file_url", file.getFileName());
+        map.put("file_url", file.toAbsolutePath().toString());
         map.put("file_modified", attrs.lastModifiedTime());
         map.put("category", "IMP");
         bulkProcessor.add(new IndexRequest(defaultIndex, defaultType).source(map));
