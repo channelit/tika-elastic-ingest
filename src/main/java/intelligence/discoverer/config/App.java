@@ -85,6 +85,12 @@ public class App {
     @Value("${parser.url}")
     String parserUrl;
 
+    @Value("${elastic.maxcount}")
+    Integer maxCount;
+
+    @Value("${elastic.maxsize}")
+    Integer maxSize;
+
     public static void main(String[] args) throws Exception {
         SpringApplication.run(App.class, args);
     }
@@ -179,8 +185,8 @@ public class App {
 
             }
         })
-                .setBulkActions(5)
-                .setBulkSize(new ByteSizeValue(5, ByteSizeUnit.MB))
+                .setBulkActions(maxCount)
+                .setBulkSize(new ByteSizeValue(maxSize, ByteSizeUnit.MB))
 //                .setFlushInterval(TimeValue.timeValueSeconds(5))
 //                .setConcurrentRequests(5)
 //                .setBackoffPolicy(
