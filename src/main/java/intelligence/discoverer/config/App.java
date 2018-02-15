@@ -153,8 +153,8 @@ public class App {
 
     @Bean
     public SentenceDetectorME sentenceDetectorME() throws IOException {
-        File file = new ClassPathResource("opennlp/en-sent.bin").getFile();
-        SentenceModel model = new SentenceModel(file);
+        Resource res = resourceLoader.getResource("classpath:opennlp/en-sent.bin");
+        SentenceModel model = new SentenceModel(res.getInputStream());
         SentenceDetectorME sdetector = new SentenceDetectorME(model);
         return sdetector;
     }
