@@ -35,6 +35,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.task.AsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -91,6 +93,11 @@ public class App {
     @Value("${elastic.maxsize}")
     Integer maxSize;
 
+    @Autowired
+    ResourceLoader resourceLoader;
+
+
+
     public static void main(String[] args) throws Exception {
         SpringApplication.run(App.class, args);
     }
@@ -117,9 +124,8 @@ public class App {
 
     @Bean
     public Tokenizer tokenizer() throws IOException {
-        File file = new ClassPathResource("opennlp/en-token.bin").getFile();
-        InputStream is = new FileInputStream(file);
-        TokenizerModel model = new TokenizerModel(is);
+        Resource res = resourceLoader.getResource("classpath:opennlp/en-token.bin");
+        TokenizerModel model = new TokenizerModel(res.getInputStream());
         Tokenizer tokenizer = new TokenizerME(model);
         return tokenizer;
     }
@@ -140,18 +146,15 @@ public class App {
     }
 
     private NameFinderME getNameFinderME(String modelFile) throws IOException {
-        File file = new ClassPathResource(modelFile).getFile();
-        InputStream is = new FileInputStream(file);
-        TokenNameFinderModel model = new TokenNameFinderModel(is);
-        is.close();
+        Resource res = resourceLoader.getResource("classpath:" + modelFile);
+        TokenNameFinderModel model = new TokenNameFinderModel(res.getInputStream());
         return new NameFinderME(model);
     }
 
     @Bean
     public SentenceDetectorME sentenceDetectorME() throws IOException {
         File file = new ClassPathResource("opennlp/en-sent.bin").getFile();
-        InputStream is = new FileInputStream(file);
-        SentenceModel model = new SentenceModel(is);
+        SentenceModel model = new SentenceModel(file);
         SentenceDetectorME sdetector = new SentenceDetectorME(model);
         return sdetector;
     }
